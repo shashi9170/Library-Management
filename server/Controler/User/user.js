@@ -63,7 +63,7 @@ const RegisterData = async (req, res) => {
    res.setHeader("Access-Control-Allow-Credentials", "true");
    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-   res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
+   res.setHeader("Access-Control-Allow-Origin", "*");
    res.status(201).json({ status: "success", message: "You have registered" });
 };
 
