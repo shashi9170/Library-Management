@@ -22,8 +22,7 @@ Connection();
 
 const COR = {
   origin: "https://react-phi-coral.vercel.app",
-  // optionsSuccessStatus: process.env.OPTIONSUCCESSSTATAUS,
-  Credential: process.env.CREDENTIALS,
+  Credential: true,
   methods: ["GET", "POST","DELETE", "PUT"],
 };
 
