@@ -23,7 +23,7 @@ export default function AllBook() {
 
   const FetchData = async () => {
     await axios
-      .get(`${BASEURL}/book/allbook`, { withCredentials: false })
+      .get(`${BASEURL}/book/allbook`, { withCredentials: true })
       .then((res) => {
         setData(res.data.book);
         setFilterData(res.data.book);
