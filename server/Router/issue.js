@@ -1,17 +1,27 @@
 const express = require("express");
 const {
   IssueBookToUser,
-  ReturnBookUser,
+  ReturnIssueBook,
   GetAllBookUserData,
 } = require("../Controler/Issue/issue");
-const { IssueBookMiddleWare } = require("../Middlewares/Issue/issue");
+const {
+  IssueBookMiddleWare,
+  IssueBookOneUserMiddleWare,
+} = require("../Middlewares/issue");
+
+const { AuthenticUser } = require("../Middlewares/user");
 
 const router = express.Router();
 
-router.post("/issuebook",IssueBookMiddleWare, IssueBookToUser);
+router.post("/issuebook", AuthenticUser, IssueBookMiddleWare, IssueBookToUser);
 
-router.post("/return", ReturnBookUser);
+router.post("/return", AuthenticUser, ReturnIssueBook);
 
-router.get("/issueAllbook/:id", GetAllBookUserData);
+router.get(
+  "/issueAllbook/:id",
+  AuthenticUser,
+  IssueBookOneUserMiddleWare,
+  GetAllBookUserData
+);
 
 module.exports = router;

@@ -2,13 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Axios from "axios";
 import { Avatar } from "@mui/material";
+import { useCookies } from "react-cookie";
+import BASEURL from "../BaseUrl";
 
 export default function Student() {
   const [image, setImage] = useState([]);
+  const [cookies, setCookies] = useCookies(["token"]);
 
   useEffect(() => {
-    Axios.get("http://localhost:4000/user/allStudent", {
-      withCredentials: false,
+    Axios.get(`${BASEURL}/user/allStudent`, {
+      withCredentials: true,
+      headers: {
+        Authorization: cookies.token,
+      },
     }).then((res) => setImage(res.data.user));
   }, [!image]);
 
@@ -25,7 +31,7 @@ export default function Student() {
                       <div className="pr-5">
                         <Avatar
                           sx={{ width: 56, height: 56 }}
-                          src={`http://localhost:4000/students/${data.image}`}
+                          src={`${data.image}`}
                         />
                       </div>
                       <div className="grid">

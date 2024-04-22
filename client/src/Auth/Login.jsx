@@ -1,44 +1,37 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import TextField from "@mui/material/TextField";
 import { Button } from "@mui/material";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { Authentic } from "../Redux/AuthData/Auth";
-
+import BASEURL from '../BaseUrl';
 
 const Login = () => {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState();
+  const [adhar, setAdhar] = useState();
   const [password, setPassword] = useState();
-  const [resp, setResp] = useState(null);
-  const [reg, setReg] = useState(null);
   const dispatch = useDispatch();
-
+  const [cookie, setCookies] = useCookies(["token"]);
 
   const LoginForm = async (e) => {
     e.preventDefault();
 
-    const loginData = { email: email, password: password };
+    const loginData = { adhar: adhar, password: password };
 
     await axios
-      .post("http://localhost:4000/user/login", loginData, {
+      .post(`${BASEURL}/user/login`, loginData, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       })
       .then((res) => {
-        if (res.status === 200) {
-          dispatch(Authentic(res.data.data));
-          navigate(`/`);
-        } else if (res.status === 202) {
-          setResp(null);
-          setReg("Please register");
-        } else {
-          setReg(null);
-          setResp("Please fill all the field");
-        }
+        setCookies("token", res.data.token, {
+          path: "/",
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 100),
+        });
+        dispatch(Authentic(res.data.data));
+        window.location.replace("/");
       })
       .catch((res) => {
         console.log(res);
@@ -47,27 +40,17 @@ const Login = () => {
 
   return (
     <>
-      {resp && <p>{resp}</p>}
-      {reg && (
-        <div>
-          <span>{reg}</span>{" "}
-          <Link to="/register" className="underline text-blue-800">
-            Register
-          </Link>
-        </div>
-      )}
-
       <div className="bg-[#FFFFFF] flex">
         <form action="" onSubmit={LoginForm}>
           <div>
             <div className="p-2">
               <TextField
                 id="outlined-basic"
-                label="Email"
+                label="Aadhar"
                 variant="outlined"
-                value={email}
+                value={adhar}
                 size="small"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setAdhar(e.target.value)}
               />
             </div>
 
@@ -82,15 +65,11 @@ const Login = () => {
               />
             </div>
 
-            <div className="flex float-right">
+            <div className="flex justify-end">
               <div className="pr-3">
                 <Button variant="contained" type="submit">
-                  Save
+                  Login
                 </Button>
-              </div>
-
-              <div>
-                <Button variant="contained">Cancel</Button>
               </div>
             </div>
           </div>

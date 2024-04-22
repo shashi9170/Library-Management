@@ -1,9 +1,8 @@
-const Issue = require("../../models/issue");
 const BookUpload = require("../../models/book");
 const IssueBook = require("../../models/issueBook");
 
 const IssueBookToUser = async (req, res) => {
-  const { Uid, Bid, ADid, subject, file } = req.body;
+  const { Uid, Bid } = req.body;
 
   await BookUpload.updateOne(
     { _id: Bid },
@@ -24,11 +23,10 @@ const IssueBookToUser = async (req, res) => {
     await IssueDoc.save();
   }
 
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.status(200).json({ message: "Successful" });
+  res.status(200).json({ status: "success", message: "Successful" });
 };
 
-const ReturnBookUser = async (req, res) => {
+const ReturnIssueBook = async (req, res) => {
   const { Uid, Bid } = req.body;
 
   const UpdatedBookData = await BookUpload.updateOne(
@@ -55,20 +53,19 @@ const GetAllBookUserData = async (req, res) => {
   const data = await IssueBook.findOne({ UserId: Uid });
 
   let arr = [];
-  if (data && data.BookId.length > 0) {
-    for (let i = 0; i < data.BookId.length; i++) {
-      const BookData = await BookUpload.findById({ _id: data.BookId[i].Bid });
-      const newBookData = {
-        Subject: BookData.Subject,
-        file: BookData.file,
-        BookId: BookData._id,
-        UserId: Uid,
-        issueDate: data.BookId[i].date,
-      };
-      arr.push(newBookData);
-    }
-    res.status(200).json({ book: arr });
-  } else res.status(201).json({ book: "You don't have any issue book" });
+  for (let i = 0; i < data.BookId.length; i++) {
+    const BookData = await BookUpload.findById({ _id: data.BookId[i].Bid });
+    const newBookData = {
+      Subject: BookData.Subject,
+      file: BookData.file,
+      BookId: BookData._id,
+      UserId: Uid,
+      issueDate: data.BookId[i].date,
+    };
+    arr.push(newBookData);
+  }
+
+  res.status(200).json({ status: "success", book: arr });
 };
 
-module.exports = { IssueBookToUser, ReturnBookUser, GetAllBookUserData };
+module.exports = { IssueBookToUser, ReturnIssueBook, GetAllBookUserData };

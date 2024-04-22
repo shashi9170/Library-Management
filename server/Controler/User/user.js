@@ -1,155 +1,123 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const {
+  getStorage,
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+} = require("firebase/storage");
+const storage = getStorage();
 
 const Profile = require("../../models/student");
-const loginSchema = require("../../models/login");
-
-/*
-User login
-*/
+const IssueBook = require("../../models/issueBook");
+const BookUpload = require("../../models/book");
 
 const LoginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { adhar, password } = req.body;
 
-  if (email && password) {
-    const data = await Profile.findOne({ adhar: email, mobile: password });
+  const data = await Profile.findOne({ adhar: adhar }).select("-password");
 
-    if (data) {
-      const token = jwt.sign(
-        { email: data.name, _id: data._id },
-        process.env.SECRET
-      );
+  const token = jwt.sign(
+    { _id: data._id, adhar: data.adhar },
+    process.env.SECRET
+  );
 
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.cookie("token", token, { maxAge: 30 * 24 * 60 * 60 * 1000 });
-      res.status(200).json({ message: "success", data: data });
-    } else {
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.status(202).json({ message: "Please register" });
-    }
-  } else {
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.status(203).json({ message: "All field are required" });
-  }
+  res.cookie("token", token, { maxAge: 30 * 24 * 60 * 60 * 1000 });
+  res.status(200).json({ message: "success", token: token, data: data });
 };
 
-/*
-Send the data for auth
-*/
-
-const UsetLoginDataForAuth = async (req, res) => {
-  const { id, email } = req.params;
-  const data = await loginSchema.find({ _id: id, email: email });
-
-  res.json({ user: data });
-};
-
-/*
- User Register Data
-*/
 const RegisterData = async (req, res) => {
-  const { name, adhar, mobile, study, dob, gender } = req.body;
-  const image = req.file.filename;
+  const { name, adhar, mobile, study, dob, gender, address, password } =
+    req.body;
+  console.log(req.body, " ", req.file);
+  const storageRef = ref(
+    storage,
+    `students/${Date.now() + req.file.originalname}`
+  );
 
-  if (name && adhar && mobile && study && dob && gender) {
-    const UserData = await Profile.findOne({ adhar: adhar, mobile: mobile });
+  const metadata = { contentType: req.file.mimetype };
 
-    if (UserData) {
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.json({ status: "failed", message: "You are already register" });
-    } else {
-      const User = new Profile({
-        name: name,
-        adhar: adhar,
-        mobile: mobile,
-        study: study,
-        dob: dob,
-        gender: gender,
-        image: image,
-      });
+  const snapshot = await uploadBytesResumable(
+    storageRef,
+    req.file.buffer,
+    metadata
+  );
+  const downloadURL = await getDownloadURL(snapshot.ref);
 
-      const result = await User.save();
+  // const salt = await bcrypt.salt(10);
+  const hashPassword = await bcrypt.hash(password, 10);
 
-      const token = jwt.sign(
-        { email: User.name, _id: User._id },
-        process.env.SECRET
-      );
+  const User = new Profile({
+    name: name,
+    adhar: adhar,
+    mobile: mobile,
+    study: study,
+    dob: dob,
+    gender: gender,
+    address: address,
+    password: hashPassword,
+    image: downloadURL,
+  });
 
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.cookie("token", token, { maxAge: 30 * 24 * 60 * 60 * 1000 });
-      res.json({ message: "Successful", data: result });
-    }
-  } else {
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.json({ status: "failed", message: "All the field are required" });
-  }
+  await User.save();
+
+  res.status(201).json({ status: "success", message: "You have registered" });
 };
 
-/*
-Send the data of all the user
-*/
 const GetAllUserData = async (req, res) => {
   const data = await Profile.find({});
 
-  return res.json({ user: data });
+  return res.status(200).json({ user: data });
 };
 
-/*
-Send the One  user data
-*/
-
 const GetUserProfile = async (req, res) => {
-  const AuthCookies = req.cookies.token;
+  const token = req.headers["authorization"];
 
-  if (AuthCookies) {
-    const { email, _id } = jwt.verify(AuthCookies, process.env.SECRET);
-    const data = await Profile.findById({ _id: _id, email });
-    if (data) {
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.status(200).json({ user: data });
-    } else {
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.status(201).json({ user: "You are not register" });
-    }
-  } else {
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.status(202).json({ user: "Please login" });
-  }
+  const { _id, adhar } = jwt.verify(token, process.env.SECRET);
+  const data = await Profile.findById({ _id: _id, adhar: adhar }).select(
+    "-password"
+  );
+
+  res.status(200).json({ user: data });
 };
 
 const GetRegisterUserData = async (req, res) => {
-  const cookieData = req.cookies.token;
-console.log(req.headers.authorization);
+  const token = req.headers["authorization"];
 
+  const { _id, adhar } = jwt.verify(token, process.env.SECRET);
+  const result = await Profile.find({ _id: _id, adhar: adhar });
 
-  if (cookieData) {
-    const { email, _id } = jwt.verify(cookieData, process.env.SECRET);
-    const result = await Profile.find({ _id: _id, name: email });
-
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.status(200).json({ message: "Successful", data: result });
-  } else {
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.status(202).json({ message: "Faild", data: "Please login" });
-  }
+  res.status(200).json({ message: "Successful", data: result });
 };
 
 const UserLogOut = (req, res) => {
   res.clearCookie("token");
-  res.header("Access-Control-Allow-Credentials", "true");
   res.json({ message: "success" });
+};
+
+const GetUserProfileAndIssueBook = async (req, res) => {
+  const Uid = req.params.id;
+  const issueBook = await IssueBook.findOne({ UserId: Uid });
+  const userData = await Profile.find({ _id: Uid });
+
+  let arr = [];
+  if (issueBook && issueBook.BookId.length > 0) {
+    for (let i = 0; i < issueBook.BookId.length; i++) {
+      const BookData = await BookUpload.findById({ _id: issueBook.BookId[i].Bid });
+      const newBookData = {
+        Subject: BookData.Subject,
+        file: BookData.file,
+        BookId: BookData._id,
+        UserId: Uid,
+        issueDate: issueBook.BookId[i].date,
+      };
+      arr.push(newBookData);
+    }
+  }
+
+  res
+    .status(200)
+    .json({ message: "Successful", userData: userData, BookData: arr });
 };
 
 module.exports = {
@@ -157,7 +125,7 @@ module.exports = {
   GetAllUserData,
   GetUserProfile,
   LoginUser,
-  UsetLoginDataForAuth,
   GetRegisterUserData,
   UserLogOut,
+  GetUserProfileAndIssueBook,
 };

@@ -12,6 +12,7 @@ const Router = require("./Router/user");
 const BookRouter = require("./Router/book");
 const IssueRouter = require("./Router/issue");
 const URLRouter = require("./Router/link");
+// require("./config");
 
 // use express and env
 const app = express();
@@ -41,6 +42,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(COR));
 app.use(cookieParser(process.env.SECRET));
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  next();
+});
 
 // Router
 app.get("/", (req, res) => {

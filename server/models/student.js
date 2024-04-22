@@ -23,6 +23,9 @@ const StudentProfile = new mongoose.Schema(
     study: {
       type: String,
     },
+    password: {
+      type: String,
+    },
     image: {
       type: String,
     },

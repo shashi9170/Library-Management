@@ -3,6 +3,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import SchoolIcon from "@mui/icons-material/School";
 import axios from "axios";
+import BASEURL from '../BaseUrl';
 
 import { UploadButton } from "./Button";
 
@@ -31,7 +32,7 @@ export default function Upload() {
 
     axios
       .post(
-        "http://localhost:4000/book/upload",
+        `${BASEURL}/book/upload`,
         BookData,
         { withCredentials: false },
         {

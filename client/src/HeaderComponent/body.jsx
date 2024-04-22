@@ -1,24 +1,29 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import { ProfileLogo, Icon, ShowMenu } from "./header";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Authentic, ResetAuthenticData } from "../Redux/AuthData/Auth";
+import BASEURL from '../BaseUrl';
 
 function Header() {
   const data = useSelector((state) => state.AuthReducer);
   const dispatch = useDispatch();
+  const [cookie, setCookies] = useCookies(["token"]);
 
   const FetchUserData = async () => {
     await axios
-      .get("http://localhost:4000/user/registerUser", {
+      .get(`${BASEURL}/user/registerUser`, {
         withCredentials: true,
+        headers: {
+          Authorization: cookie.token,
+        },
       })
       .then((res) => {
-        if (res.status === 200) dispatch(Authentic(res.data.data[0]));
-        else dispatch(ResetAuthenticData());
+         dispatch(Authentic(res.data.data[0]));
       })
-      .catch((err) => console.log("Error"));
+      .catch((err) => console.log("Error ", err));
   };
 
   useEffect(() => {

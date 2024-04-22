@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
+import { useCookies } from "react-cookie";
+import { Link } from "react-router-dom";
 import Axios from "axios";
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { ResetAuthenticData } from "../Redux/AuthData/Auth";
+import { useDispatch, useSelector } from "react-redux";
+import { ResetAuthenticData, Authentic } from "../Redux/AuthData/Auth";
+import BASEURL from "../BaseUrl";
 
 export default function ProfileOfOneUser() {
-  const [data, setData] = useState([]);
   const [bookData, setBookData] = useState([]);
   const [RBook, setRBook] = useState();
   const [Return, setReturn] = useState(null);
@@ -15,36 +17,35 @@ export default function ProfileOfOneUser() {
   const [issueBook, setIssueBook] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [cookie, setCookies, removeToken] = useCookies(["token"]);
+  const data = useSelector((state) => state.AuthReducer);
 
   const FetchUserData = async () => {
-    await Axios.get(`http://localhost:4000/user/profile`, {
+    await Axios.get(`${BASEURL}/user/profile`, {
       withCredentials: true,
+      headers: {
+        Authorization: cookie.token,
+      },
     })
       .then((res) => {
-        if (res.status === 200) {
-          setData(res.data.user);
-          setId(res.data.user._id);
-          FetchIssueBookData(res.data.user._id);
-        } else {
-          window.location.replace("/login");
-        }
+        dispatch(Authentic(res.data.user));
+        setId(res.data.user._id);
+        FetchIssueBookData(res.data.user._id);
       })
       .catch((res) => console.log("Error"));
   };
 
   const FetchIssueBookData = async (UserId) => {
-    await Axios.get(`http://localhost:4000/issue/issueAllbook/${UserId}`, {
-      withCredentials: false,
+    await Axios.get(`${BASEURL}/issue/issueAllbook/${UserId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: cookie.token,
+      },
     })
       .then((res) => {
-        if (res.status === 200) {
-          setBookData(res.data.book);
-        } else if (res.status === 201) {
-          setBookData([]);
-          setIssueBook(res.data.book);
-        }
+        setBookData(res.data.book);
       })
-      .catch((res) => console.log("Error"));
+      .catch((res) => console.log("student Error ", res));
   };
 
   const BookReturnRenual = (Bid) => {
@@ -57,8 +58,11 @@ export default function ProfileOfOneUser() {
 
     const book = { Uid: RBook[0].UserId, Bid: RBook[0].BookId };
 
-    await Axios.post("http://localhost:4000/issue/return", book, {
+    await Axios.post(`${BASEURL}/issue/return`, book, {
       withCredentials: false,
+      headers: {
+        Authorization: cookie.token,
+      },
     })
       .then((res) => {
         if (res.data.Ret) {
@@ -74,14 +78,8 @@ export default function ProfileOfOneUser() {
   }, []);
 
   const LogOutFromWeb = async () => {
-    await Axios.get("http://localhost:4000/user/logout", {
-      withCredentials: true,
-    })
-      .then((res) => {
-        dispatch(ResetAuthenticData());
-        navigate("/");
-      })
-      .catch((err) => console.log("Error"));
+    removeToken(["token"]);
+    window.location.replace("/login");
   };
 
   return (
@@ -93,7 +91,7 @@ export default function ProfileOfOneUser() {
               <div className="flex md:justify-start mb-2">
                 <Avatar
                   sx={{ width: 110, height: 105 }}
-                  src={`http://localhost:4000/students/${data.image}`}
+                  src={`${data.image}`}
                 />
               </div>
 
@@ -116,9 +114,11 @@ export default function ProfileOfOneUser() {
               >
                 Return
               </button>
-              <button className="px-1 py-1 mr-auto hover:bg-[#82ccdd] rounded hover:text-[#ffffff]">
-                Edit
-              </button>
+              <Link to="/allStudent">
+                <button className="px-1 py-1 mr-auto hover:bg-[#82ccdd] rounded hover:text-[#ffffff]">
+                  Student
+                </button>
+              </Link>
               <button
                 className="px-1 py-1 mr-auto hover:bg-[#82ccdd] rounded hover:text-[#ffffff]"
                 onClick={LogOutFromWeb}
@@ -156,8 +156,20 @@ export default function ProfileOfOneUser() {
                       >
                         {data.Subject}
                       </th>
-                      <td className="px-2 py-2">{data.issueDate.substring(0,10).split("-").reverse().join("-")}</td>
-                      <td className="px-2 py-2">{data.issueDate.substring(0,10).split("-").reverse().join("-")}</td>
+                      <td className="px-2 py-2">
+                        {data.issueDate
+                          .substring(0, 10)
+                          .split("-")
+                          .reverse()
+                          .join("-")}
+                      </td>
+                      <td className="px-2 py-2">
+                        {data.issueDate
+                          .substring(0, 10)
+                          .split("-")
+                          .reverse()
+                          .join("-")}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -186,7 +198,7 @@ export default function ProfileOfOneUser() {
                   <div className="p-2">
                     <img
                       className="w-full h-[30%] md:w-[200px] sm:h-[150px]"
-                      src={`http://localhost:4000/books/${data.file}`}
+                      src={`${BASEURL}/books/${data.file}`}
                       alt="Shoes"
                     />
                   </div>

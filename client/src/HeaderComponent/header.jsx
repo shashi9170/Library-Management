@@ -1,6 +1,7 @@
 import React, { useState} from "react";
 import { Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
+import BASEURL from "../BaseUrl";
 
 export function Icon() {
   const [flag, setFlag] = useState(false);
@@ -82,7 +83,7 @@ export function ProfileLogo(props) {
       <Link to="/profile">
         <Avatar
           sx={{ width: 40, height: 40 }}
-          src={`http://localhost:4000/students/${props.data.image}`}
+          src={`${props.data.image}`}
         />
       </Link>
     </>

@@ -14,19 +14,19 @@ const UploadBook = async (req, res) => {
     file: file,
   });
 
-  book.save();
-  res.send("Success");
+  await book.save();
+  res.status(200).json({ message: "Success" });
 };
 
 const GetAllBookData = async (req, res) => {
   const BookData = await BookUpload.find({});
-  res.json({ book: BookData });
+  res.status(200).json({ book: BookData });
 };
 
 const GetOneBookData = async (req, res) => {
   const BookData = await BookUpload.findById({ _id: req.params.id });
 
-  res.json({ book: BookData });
+  res.status(200).json({ book: BookData });
 };
 
 module.exports = { UploadBook, GetAllBookData, GetOneBookData };

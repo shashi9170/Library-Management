@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useCookies } from "react-cookie";
 import { Authentic, ResetAuthenticData } from "../Redux/AuthData/Auth";
+import BASEURL from "../BaseUrl";
 
 import HeroSection from "../Component/Hero_section";
 import Footer from "../HeaderComponent/Footer";
@@ -13,21 +14,16 @@ export default function Home() {
 
   const FetchUserData = async () => {
     await axios
-      .get("http://localhost:4000/user/registerUser", {
+      .get(`${BASEURL}/user/registerUser`, {
         withCredentials: true,
         headers: {
           Authorization: cookies.token,
-          // "Access-Control-Allow-Credentials": "true",
         },
       })
       .then((res) => {
-        if (res.status === 200) {
-          dispatch(Authentic(res.data.data[0]));
-        } else {
-          dispatch(ResetAuthenticData());
-        }
+        dispatch(Authentic(res.data.data[0]));
       })
-      .catch((err) => console.log("All Error"));
+      .catch((err) => console.log("All Error "));
   };
 
   useEffect(() => {

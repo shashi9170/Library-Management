@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import TextField from "@mui/material/TextField";
+import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { Authentic, ResetAuthenticData } from "../Redux/AuthData/Auth";
+import BASEURL from '../BaseUrl';
 
 export function OneBookById() {
   const UserData = useSelector((state) => state.AuthReducer);
@@ -19,27 +21,26 @@ export function OneBookById() {
   const [URL, setURL] = useState();
   const [open, setOpen] = useState(null);
   const [openURL, setOpenURL] = useState(null);
+  const [cookie, setCookies] = useCookies(["token"]);
 
   const FetchUserData = async () => {
     await axios
-      .get("http://localhost:4000/user/registerUser", {
+      .get(`${BASEURL}/user/registerUser`, {
         withCredentials: true,
+        headers: {
+          Authorization: cookie.token,
+        },
       })
       .then((res) => {
-        if (res.status === 200) {
-          dispatch(Authentic(res.data.data[0]));
-          setUserId(res.data.data[0]._id);
-        } else {
-          dispatch(ResetAuthenticData());
-          setAuth("Please login");
-        }
+        dispatch(Authentic(res.data.data[0]));
+        setUserId(res.data.data[0]._id);
       })
       .catch((err) => console.log("Error"));
   };
 
   const FetchData = async () => {
     await axios
-      .get(`http://localhost:4000/book/${id}`, { withCredentials: false })
+      .get(`${BASEURL}/book/${id}`, { withCredentials: false })
       .then((res) => setData(res.data.book))
       .catch((err) => console.log("Book : Error"));
   };
@@ -49,14 +50,15 @@ export function OneBookById() {
 
     const data = { Uid: userId, Bid: bookId };
     await axios
-      .post("http://localhost:4000/issue/issuebook", data, {
+      .post(`${BASEURL}/issue/issuebook`, data, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: cookie.token,
         },
       })
       .then((res) => setIssue(res.data.message))
-      .catch((err) => console.log("Issue : Error ", err));
+      .catch((res) => setIssue(res.response.data.message));
   };
 
   const HadleURLFormData = (e) => {
@@ -65,7 +67,7 @@ export function OneBookById() {
     const URLData = { Uid: userId, Bid: bookId, url: URL };
 
     axios
-      .post("http://localhost:4000/URL/link", URLData, {
+      .post(`${BASEURL}/URL/link`, URLData, {
         withCredentials: false,
       })
       .then((res) => console.log(res))
@@ -85,7 +87,7 @@ export function OneBookById() {
             <div className="p-2">
               <img
                 className="w-full h-[100%] md:w-[400px] md:h-[200px]"
-                src={`http://localhost:4000/books/${Bookdata.file}`}
+                src={`${BASEURL}/books/${Bookdata.file}`}
                 alt="Shoes"
               />
             </div>

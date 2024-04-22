@@ -5,10 +5,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import Radio from "@mui/material/Radio";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-
-import { Authentic } from "../Redux/AuthData/Auth";
 import { UploadButton } from "../Book/Button";
+import BASEURL from '../BaseUrl';
 
 const Register = () => {
   const [name, setName] = useState();
@@ -18,10 +16,10 @@ const Register = () => {
   const [dob, setDOB] = useState();
   const [address, setAddress] = useState();
   const [gender, setGender] = useState();
+  const [password, setPassword] = useState();
   const [file, setFile] = useState();
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleChange = (event) => {
     setGender(event.target.value);
@@ -46,23 +44,22 @@ const Register = () => {
       dob: dob,
       address: address,
       gender: gender,
+      password: password,
       file: file,
     };
 
     await axios
-      .post("http://localhost:4000/user/register", UserData, {
-        withCredentials:true,
+      .post(`${BASEURL}/user/register`, UserData, {
+        withCredentials: true,
         headers: {
           "content-type": "multipart/form-data",
         },
       })
       .then((res) => {
-        dispatch(Authentic(res.data.data));
-        navigate("/");
+        window.location.replace("/login");
       })
-      .catch((err) => {
-        console.log("error")
-        navigate("/register");
+      .catch((res) => {
+        console.log(res);
       });
   };
 
@@ -128,6 +125,17 @@ const Register = () => {
                   size="small"
                   value={dob}
                   onChange={(e) => setDOB(e.target.value)}
+                />
+              </div>
+
+              <div className="p-2">
+                <TextField
+                  id="outlined-basic"
+                  label="Password"
+                  variant="outlined"
+                  size="small"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
 

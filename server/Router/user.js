@@ -1,31 +1,33 @@
 const express = require("express");
 
-// import the all file from controller
+require("../config");
+
 const {
   RegisterData,
   GetAllUserData,
   GetUserProfile,
   LoginUser,
-  UsetLoginDataForAuth,
   GetRegisterUserData,
   UserLogOut,
+  GetUserProfileAndIssueBook
 } = require("../Controler/User/user");
 
+const { AuthenticUser,UserRegisterMiddleWare,UserLoginMiddleWare } = require("../Middlewares/user");
 const { GetAdminData, AdminRegisterdata } = require("../Controler/Admin/admin");
-
-const upload = require("../Controler/User/ProfileUpload");
+const firebaseUpload = require("../Controler/User/Uploads");
+// const upload = require("../Controler/User/ProfileUpload");
 
 const router = express.Router();
 
-router.get("/registerUser", GetRegisterUserData);
-router.post("/login", LoginUser);
+router.get("/registerUser", AuthenticUser, GetRegisterUserData);
+router.post("/login",UserLoginMiddleWare, LoginUser);
 router.get("/logout", UserLogOut);
-router.get("/auth/:id/:email", UsetLoginDataForAuth);
 
-router.post("/register", upload.single("file"), RegisterData);
+router.post("/register", firebaseUpload.single("file"), UserRegisterMiddleWare, RegisterData);
 
-router.get("/allStudent", GetAllUserData);
-router.get("/profile", GetUserProfile);
+router.get("/allStudent", AuthenticUser, GetAllUserData);
+router.get("/profile", AuthenticUser, GetUserProfile);
+router.get("/:id", AuthenticUser, GetUserProfileAndIssueBook);
 
 router.get("/admin/:id", GetAdminData);
 router.post("/admin/register", AdminRegisterdata);
