@@ -21,16 +21,16 @@ const port = process.env.PORT;
 Connection();
 
 const COR = {
-  origin: "http://localhost:3000",
+  origin: "https://react-phi-coral.vercel.app",
   // optionsSuccessStatus: process.env.OPTIONSUCCESSSTATAUS,
   Credential: process.env.CREDENTIALS,
-  // methods: ["GET", "POST"],
+  methods: ["GET", "POST","DELETE", "PUT"],
 };
 
 app.options(
   "*",
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://react-phi-coral.vercel.app",
     credentials: true,
   })
 );
@@ -44,7 +44,7 @@ app.use(cors(COR));
 app.use(cookieParser(process.env.SECRET));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, PATCH, DELETE"
