@@ -23,8 +23,11 @@ export default function AllBook() {
 
   const FetchData = async () => {
     await axios
-      .get(`${BASEURL}/book/allbook`, { withCredentials: true })
-      .then((res) => {
+      .get(`${BASEURL}/book/allbook`, { withCredentials: true,
+          headers: {
+          "Access-Control-Allow-Origin": `${BASEURL}`,
+          },
+        }).then((res) => {
         setData(res.data.book);
         setFilterData(res.data.book);
         res.data.book.map((data) => st.add(data.Subject));
