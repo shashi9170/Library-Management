@@ -6,7 +6,7 @@ import Radio from "@mui/material/Radio";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UploadButton } from "../Book/Button";
-import BASEURL from '../BaseUrl';
+import BASEURL from "../BaseUrl";
 
 const Register = () => {
   const [name, setName] = useState();
@@ -52,6 +52,8 @@ const Register = () => {
       .post(`${BASEURL}/user/register`, UserData, {
         withCredentials: true,
         headers: {
+          "Access-Control-Allow-Origin": `${BASEURL}`,
+          Accept: "application/json",
           "content-type": "multipart/form-data",
         },
       })
