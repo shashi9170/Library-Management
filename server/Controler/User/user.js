@@ -119,15 +119,29 @@ const GetUserProfile = async (req, res) => {
 
 const GetRegisterUserData = async (req, res) => {
   const cookieData = req.cookies.token;
+console.log(req.headers.authorization);
+
 
   if (cookieData) {
     const { email, _id } = jwt.verify(cookieData, process.env.SECRET);
     const result = await Profile.find({ _id: _id, name: email });
 
-    res.header("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
     res.status(200).json({ message: "Successful", data: result });
   } else {
-    res.header("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
     res.status(202).json({ message: "Faild", data: "Please login" });
   }
 };

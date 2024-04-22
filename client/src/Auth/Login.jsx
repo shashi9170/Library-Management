@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { Authentic } from "../Redux/AuthData/Auth";
 
+
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState();
@@ -13,6 +14,7 @@ const Login = () => {
   const [resp, setResp] = useState(null);
   const [reg, setReg] = useState(null);
   const dispatch = useDispatch();
+
 
   const LoginForm = async (e) => {
     e.preventDefault();
@@ -48,7 +50,10 @@ const Login = () => {
       {resp && <p>{resp}</p>}
       {reg && (
         <div>
-          <span>{reg}</span> <Link to="/register" className="underline text-blue-800">Register</Link>
+          <span>{reg}</span>{" "}
+          <Link to="/register" className="underline text-blue-800">
+            Register
+          </Link>
         </div>
       )}
 

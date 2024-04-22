@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const path = require('path');
+const path = require("path");
 
 // import the all file
 const Connection = require("./Connection");
@@ -13,7 +13,6 @@ const BookRouter = require("./Router/book");
 const IssueRouter = require("./Router/issue");
 const URLRouter = require("./Router/link");
 
-
 // use express and env
 const app = express();
 const port = process.env.PORT;
@@ -21,13 +20,21 @@ const port = process.env.PORT;
 Connection();
 
 const COR = {
-  origin: process.env.ORIGIN,
-  optionsSuccessStatus: process.env.OPTIONSUCCESSSTATAUS,
+  origin: "http://localhost:3000",
+  // optionsSuccessStatus: process.env.OPTIONSUCCESSSTATAUS,
   Credential: process.env.CREDENTIALS,
-  methods: ["GET", "POST"],
+  // methods: ["GET", "POST"],
 };
 
-app.use(express.static(path.join(__dirname, 'uploads')));
+app.options(
+  "*",
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+app.use(express.static(path.join(__dirname, "uploads")));
 
 //Middleware plugin
 app.use(express.urlencoded({ extended: true }));
