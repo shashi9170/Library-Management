@@ -50,7 +50,6 @@ const Register = () => {
 
     await axios
       .post(`${BASEURL}/user/register`, UserData, {
-        withCredentials: true,
         headers: {
           "Access-Control-Allow-Origin": `${BASEURL}`,
           "content-type": "multipart/form-data",
