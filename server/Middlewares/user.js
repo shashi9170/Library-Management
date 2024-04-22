@@ -18,6 +18,10 @@ const UserRegisterMiddleWare = async (req, res, next) => {
     !address ||
     !password
   ) {
+     res.setHeader("Access-Control-Allow-Credentials", "true");
+     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+     res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
     res
       .status(400)
       .json({ status: "Failed", message: "All the field are required" });
@@ -25,6 +29,10 @@ const UserRegisterMiddleWare = async (req, res, next) => {
     const userData = await Profile.findOne({ adhar: adhar });
 
     if (userData) {
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
       res.status(400).json({
         status: "Failed",
         message: "This adhar number has already register",
@@ -39,6 +47,10 @@ const UserLoginMiddleWare = async (req, res, next) => {
   const { adhar, password } = req.body;
 
   if (!adhar || !password) {
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
     res
       .status(400)
       .json({ status: "Failed", message: "All the field are required" });
@@ -48,12 +60,21 @@ const UserLoginMiddleWare = async (req, res, next) => {
     if (userData) {
       const isMatch = bcrypt.compare(password, userData.password);
       if (isMatch) next();
-      else
+      else{
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
         res.status(400).json({
           status: "Failed",
           message: "Your password or adhar number is wrong",
         });
+      }
     } else {
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
       res.status(400).json({ status: "Failed", message: "Please register" });
     }
   }
@@ -69,9 +90,17 @@ const AuthenticUser = async (req, res, next) => {
     if (userData) {
       next();
     } else {
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
       res.status(400).json({ status: "Failed", message: "Please login" });
     }
   } else {
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader("Access-Control-Allow-Origin", "https://react-phi-coral.vercel.app");
     res.status(400).json({ status: "Failed", message: "Please login" });
   }
 };
