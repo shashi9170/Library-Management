@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Profile = require("../models/student");
 
-const UserRegisterMiddleWare = async (req, res, next) => {
+const UserRegisterMiddleWare = (req, res, next) => {
   const { name, adhar, mobile, study, dob, gender, address, password } =
     req.body;
   const file = req.file;
@@ -26,7 +26,7 @@ const UserRegisterMiddleWare = async (req, res, next) => {
       .status(400)
       .json({ status: "Failed", message: "All the field are required" });
   } else {
-    const userData = await Profile.findOne({ adhar: adhar });
+    const userData = Profile.findOne({ adhar: adhar });
 
     if (userData) {
       res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -43,7 +43,7 @@ const UserRegisterMiddleWare = async (req, res, next) => {
   }
 };
 
-const UserLoginMiddleWare = async (req, res, next) => {
+const UserLoginMiddleWare = (req, res, next) => {
   const { adhar, password } = req.body;
 
   if (!adhar || !password) {
@@ -55,7 +55,7 @@ const UserLoginMiddleWare = async (req, res, next) => {
       .status(400)
       .json({ status: "Failed", message: "All the field are required" });
   } else {
-    const userData = await Profile.findOne({ adhar: adhar });
+    const userData = Profile.findOne({ adhar: adhar });
 
     if (userData) {
       const isMatch = bcrypt.compare(password, userData.password);
@@ -80,12 +80,12 @@ const UserLoginMiddleWare = async (req, res, next) => {
   }
 };
 
-const AuthenticUser = async (req, res, next) => {
+const AuthenticUser = (req, res, next) => {
   const token = req.headers["authorization"];
 
   if (token) {
     const { _id, adhar } = jwt.verify(token, process.env.SECRET);
-    const userData = await Profile.findOne({ _id: _id, adhar: adhar });
+    const userData = Profile.findOne({ _id: _id, adhar: adhar });
 
     if (userData) {
       next();
