@@ -30,19 +30,19 @@ const RegisterData = async (req, res) => {
   const { name, adhar, mobile, study, dob, gender, address, password } =
     req.body;
  
-  // const storageRef = ref(
-  //   storage,
-  //   `students/${Date.now() + req.file.originalname}`
-  // );
+  const storageRef = ref(
+    storage,
+    `students/${Date.now() + req.file.originalname}`
+  );
 
-  // const metadata = { contentType: req.file.mimetype };
+  const metadata = { contentType: req.file.mimetype };
 
-  // const snapshot = await uploadBytesResumable(
-  //   storageRef,
-  //   req.file.buffer,
-  //   metadata
-  // );
-  // const downloadURL = await getDownloadURL(snapshot.ref);
+  const snapshot = await uploadBytesResumable(
+    storageRef,
+    req.file.buffer,
+    metadata
+  );
+  const downloadURL = await getDownloadURL(snapshot.ref);
 
   // const salt = await bcrypt.salt(10);
   const hashPassword = await bcrypt.hash(password, 10);
@@ -56,7 +56,7 @@ const RegisterData = async (req, res) => {
     gender: gender,
     address: address,
     password: hashPassword,
-    image: "shashi",
+    image: downloadURL,
   });
 
   await User.save();
