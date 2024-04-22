@@ -53,7 +53,6 @@ const Register = () => {
         withCredentials: true,
         headers: {
           "Access-Control-Allow-Origin": `${BASEURL}`,
-          Accept: "application/json",
           "content-type": "multipart/form-data",
         },
       })
