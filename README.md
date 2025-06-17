@@ -54,7 +54,7 @@ git clone https://github.com/shashi9170/Library-Management.git
 cd Library-Management
 ```
 
-###2. Backend Setup
+**2. Backend Setup**
 ```bash
 cd server
 npm install
@@ -64,7 +64,7 @@ MONGO_URI=your_mongodb_connection_string
 npm run dev
 ```
 
-###3. Frontend Setup
+**3. Frontend Setup**
 ```bash
 cd client
 npm install
