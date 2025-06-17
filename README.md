@@ -49,7 +49,24 @@ A complete **Library Management System** built using the **MERN Stack** (MongoDB
 ## ⚙️ Getting Started
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/shashi9170/Library-Management.git
 cd Library-Management
+```
+
+###2. Backend Setup
+```bash
+cd server
+npm install
+touch .env
+PORT=8000
+MONGO_URI=your_mongodb_connection_string
+npm run dev
+```
+
+###3. Frontend Setup
+```bash
+cd client
+npm install
+npm start
+```
