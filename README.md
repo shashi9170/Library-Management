@@ -43,9 +43,6 @@ A complete **Library Management System** built using the **MERN Stack** (MongoDB
 
 ---
 
-
----
-
 ## ⚙️ Getting Started
 
 ### 1. Clone the Repository
